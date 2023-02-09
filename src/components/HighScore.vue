@@ -17,6 +17,7 @@ import { ref, computed } from "vue";
 import getCollection from "../composables/getCollection";
 
 export default {
+  name: "HighScore",
   setup() {
     const { documents: highscores } = getCollection("highscores");
     const highScoreCount = ref(10);

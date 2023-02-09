@@ -1,6 +1,14 @@
 <template>
   <div id="placeholder"></div>
-  <div id="grid-board"></div>
+  <div class="wrapper">
+    <img
+      class="intro-img"
+      src="@/assets/intro.png"
+      alt="snake game"
+      id="snake-img"
+    />
+    <div id="grid-board"></div>
+  </div>
 </template>
 
 <script>
@@ -34,6 +42,7 @@ export default {
       () => props.isListening,
       (currentValue) => {
         if (currentValue) {
+          document.getElementById("snake-img").classList.add("remove");
           //add event listener for direction
           window.addEventListener("keydown", (e) => {
             if (props.gameOver) return;
@@ -276,6 +285,27 @@ export default {
 </script>
 
 <style lang="scss">
+.wrapper {
+  width: 100%;
+  aspect-ratio: 1/1;
+  max-width: 700px;
+  max-height: 700px;
+  margin: auto;
+}
+.intro-img {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 70%;
+  padding: 20px;
+  padding-top: 30px;
+  max-width: 600px;
+  transition: all 0.5s ease-in-out;
+}
+.remove {
+  opacity: 0;
+}
 #grid-board {
   background-color: white;
   width: 100%;

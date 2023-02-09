@@ -43,6 +43,9 @@
     </button>
     <button v-else type="button" @click="togglePaused">Pause - press p</button>
 
+    <div v-if="state.isListening && !state.isPaused && !state.gameOver">
+      <p>Use arrows or WASD to move</p>
+    </div>
     <!-- NAME MODAL -->
     <GameModal
       :modalActive="state.nameModalActive"
