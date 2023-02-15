@@ -1,5 +1,10 @@
 # snake-game
 
+## Play online at:
+```
+https://snake-game-alexandra.web.app/
+```
+
 ## Project setup
 ```
 npm install
