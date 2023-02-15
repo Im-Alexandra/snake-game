@@ -19,6 +19,7 @@ import error from "../assets/error.wav";
 export default {
   name: "SnakeGrid",
   props: ["isListening", "isPaused", "gameOver", "score", "isMoving"],
+  emits: ["moving", "togglePaused", "gameOver", "scored"],
   setup(props, { emit }) {
     let lastRenderTime = 0;
     //how many times per second (cca) the snake moves

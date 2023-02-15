@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1 @click="state.gameOver = true">
+    <h1>
       <span class="emoji">🐍</span> Snake game <span class="emoji">🐍</span>
     </h1>
     <div class="nav">
@@ -82,7 +82,14 @@
           Your score: {{ state.score }}, your time: {{ state.time }}s
         </p>
         <h2>High score:</h2>
-        <HighScore />
+        <HighScore
+          :player="{
+            player: state.player,
+            score: state.score,
+            time: state.time,
+          }"
+          :modalActive="state.gameOverModalActive"
+        />
         <button @click="restartGame" type="button">Restart game</button>
       </div>
     </GameModal>

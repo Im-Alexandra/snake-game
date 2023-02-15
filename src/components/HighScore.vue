@@ -13,12 +13,13 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import getCollection from "../composables/getCollection";
 
 export default {
   name: "HighScore",
-  setup() {
+  props: ["player", "modalActive"],
+  setup(props) {
     const { documents: highscores } = getCollection("highscores");
     const highScoreCount = ref(10);
 
@@ -38,7 +39,22 @@ export default {
       return array;
     };
 
-    /*  const highlightIfInHighscore = (player, score, time) => {
+    watch(
+      () => props.modalActive,
+      () => {
+        if (props.modalActive) {
+          setTimeout(() => {
+            highlightIfInHighscore(
+              props.player.player,
+              props.player.score,
+              props.player.time
+            );
+          }, 500);
+        }
+      }
+    );
+
+    const highlightIfInHighscore = (player, score, time) => {
       const index = sortedHighScores.value.findIndex(
         (row) =>
           row.player.toLowerCase() === player.toLowerCase() &&
@@ -46,16 +62,18 @@ export default {
           row.time === time
       );
       if (index !== -1) {
-        let el = document.getElementById("high-score").children[index];
+        //there is multiple modals with highscore in DOM -.- duh
+        let el =
+          document.getElementsByClassName("high-score")[1].children[index];
         el.classList.add("highlight");
       }
-    }; */
+    };
 
     return {
       highscores,
       highScoreCount,
       sortedHighScores,
-      /* highlightIfInHighscore, */
+      highlightIfInHighscore,
     };
   },
 };
@@ -77,6 +95,7 @@ export default {
     gap: 10px;
     border-bottom: 2px solid #dcdcdc;
     padding-left: 5px;
+    transition: all 0.2s ease;
 
     @media (min-width: 720px) {
       .order {
