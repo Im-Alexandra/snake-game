@@ -13,6 +13,7 @@
     </div>
 
     <!-- <SnakeCanvas :isListening="state.isListening"></SnakeCanvas> -->
+
     <SnakeGrid
       :isListening="state.isListening"
       :isPaused="state.isPaused"

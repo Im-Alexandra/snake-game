@@ -1,6 +1,6 @@
 <template>
-  <div id="placeholder"></div>
   <div class="wrapper">
+    <div id="placeholder"></div>
     <img
       class="intro-img"
       src="@/assets/intro.png"
