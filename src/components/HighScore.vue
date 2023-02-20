@@ -91,7 +91,6 @@ export default {
     watch(
       () => props.difficulty,
       () => {
-        console.log("change");
         difficultyQuery.value = props.difficulty;
       }
     );
