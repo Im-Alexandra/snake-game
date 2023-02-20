@@ -66,7 +66,7 @@ button:disabled {
   p {
     margin-bottom: 16px;
   }
-  input {
+  input[type="text"] {
     font-family: "Josefin Sans", sans-serif;
     text-transform: uppercase;
     font-size: 1em;
@@ -76,7 +76,7 @@ button:disabled {
     border-radius: 4px;
     border: none;
     background-color: #d7d7d7;
-    margin-bottom: 16px;
+    margin-bottom: 32px;
     &:focus {
       border: none;
       outline: none;

@@ -22,6 +22,7 @@
 export default {
   props: ["modalActive"],
   /* emit is deconstructured from context, using composition API here*/
+  emits: ["close"],
   setup(props, { emit }) {
     const close = () => {
       emit("close");

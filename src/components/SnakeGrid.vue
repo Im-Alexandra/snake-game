@@ -1,31 +1,50 @@
 <template>
-  <div class="wrapper">
-    <div id="placeholder"></div>
-    <img
-      class="intro-img"
-      src="@/assets/intro.png"
-      alt="snake game"
-      id="snake-img"
-    />
-    <div id="grid-board"></div>
+  <div class="container">
+    <div class="nav">
+      <p>Time: {{ time }}</p>
+      <p>Score: {{ score }}</p>
+      <p>Player: {{ player }}</p>
+      <div v-if="difficulty" class="difficulty">
+        {{ difficulty.toUpperCase() }}
+      </div>
+      <button @click="$emit('openHighScore')">See high score</button>
+    </div>
+    <div class="wrapper">
+      <div id="placeholder"></div>
+      <img
+        class="intro-img"
+        src="@/assets/intro.png"
+        alt="snake game"
+        id="snake-img"
+      />
+      <div id="grid-board"></div>
+    </div>
   </div>
 </template>
 
 <script>
-import { onMounted, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import scored from "../assets/scored.wav";
 import error from "../assets/error.wav";
 
 export default {
   name: "SnakeGrid",
-  props: ["isListening", "isPaused", "gameOver", "score", "isMoving"],
-  emits: ["moving", "togglePaused", "gameOver", "scored"],
+  props: [
+    "isListening",
+    "isPaused",
+    "gameOver",
+    "isMoving",
+    "difficulty",
+    "player",
+  ],
+  emits: ["moving", "togglePaused", "gameOver", "openHighScore"],
   setup(props, { emit }) {
     let lastRenderTime = 0;
     //how many times per second (cca) the snake moves
     let speed = 4;
+    let speedDivisor = 5;
     const snake = [{ x: 11, y: 11 }];
-    const growRate = 1;
+    let growRate = 1;
     let newSnakeSegments = 0;
     let food = { x: 1, y: 1 };
     const foodValue = 1;
@@ -33,6 +52,8 @@ export default {
     let lastDirection = { x: 0, y: 0 };
     const gridSize = 21;
     let foodColor = "#258EA6";
+    let time = ref(0);
+    let score = ref(0);
 
     onMounted(() => {
       food = getRandomFoodPos();
@@ -45,6 +66,7 @@ export default {
         if (currentValue) {
           document.getElementById("snake-img").classList.add("remove");
           //add event listener for direction
+          setDifficultyVariables();
           window.addEventListener("keydown", (e) => {
             if (props.gameOver) return;
             switch (e.key) {
@@ -53,6 +75,7 @@ export default {
                 if (lastDirection.y !== 0 || props.isPaused) break;
                 if (!props.isMoving) {
                   emit("moving");
+                  timer();
                 }
                 direction = { x: 0, y: -1 };
                 break;
@@ -61,6 +84,7 @@ export default {
                 if (lastDirection.y !== 0 || props.isPaused) break;
                 if (!props.isMoving) {
                   emit("moving");
+                  timer();
                 }
                 direction = { x: 0, y: 1 };
                 break;
@@ -69,6 +93,7 @@ export default {
                 if (lastDirection.x !== 0 || props.isPaused) break;
                 if (!props.isMoving) {
                   emit("moving");
+                  timer();
                 }
                 direction = { x: -1, y: 0 };
                 break;
@@ -77,11 +102,13 @@ export default {
                 if (lastDirection.x !== 0 || props.isPaused) break;
                 if (!props.isMoving) {
                   emit("moving");
+                  timer();
                 }
                 direction = { x: 1, y: 0 };
                 break;
               case props.isPaused && " ":
                 emit("togglePaused");
+
                 break;
               case !props.isPaused && "p":
                 if (!props.isMoving) return;
@@ -98,11 +125,37 @@ export default {
       () => props.isPaused,
       (currentValue) => {
         if (!currentValue) {
-          //if unpaused call the mainloop again
+          //if unpaused call the mainloop again and resume timer
           window.requestAnimationFrame(mainLoop);
+          timer();
         }
       }
     );
+
+    const timer = () => {
+      if (props.isPaused || props.gameOver) return;
+      time.value++;
+
+      if (time.value % speedDivisor === 0) {
+        speed += 0.5;
+        console.log(speed, speedDivisor, props.difficulty);
+      }
+
+      setTimeout(timer, 1000);
+    };
+
+    const setDifficultyVariables = () => {
+      if (props.difficulty === "easy") {
+        speedDivisor = 5;
+        growRate = 1;
+      } else if (props.difficulty === "medium") {
+        speedDivisor = 4;
+        growRate = 2;
+      } else if (props.difficulty === "hard") {
+        speedDivisor = 3;
+        growRate = 3;
+      }
+    };
 
     /* GAME METHODS */
     const mainLoop = (currentTime) => {
@@ -141,7 +194,13 @@ export default {
       if (outsideGrid(getSnakeHead()) || snakeIntersection()) {
         const audio = new Audio(error);
         audio.play();
-        emit("gameOver");
+        const data = {
+          player: props.player,
+          time: time.value,
+          score: score.value,
+          difficulty: props.difficulty,
+        };
+        emit("gameOver", data);
       }
     };
     const outsideGrid = (pos) => {
@@ -204,11 +263,10 @@ export default {
     const updateFood = () => {
       if (onSnake(food)) {
         animateScored();
-        emit("scored", foodValue);
+        score.value = score.value + foodValue;
         addSnakeSegments(growRate);
         food = getRandomFoodPos();
         foodColor = getRandomFoodColor();
-        if ((props.score & 1) !== 1) speed += 0.5;
       }
     };
     const drawFood = () => {
@@ -268,10 +326,13 @@ export default {
     };
 
     return {
+      time,
+      score,
       getRandomFoodPos,
       getRandomFoodColor,
       lastRenderTime,
       speed,
+      speedDivisor,
       snake,
       growRate,
       newSnakeSegments,
@@ -286,6 +347,36 @@ export default {
 </script>
 
 <style lang="scss">
+.container {
+  max-width: 700px;
+  width: 100%;
+}
+.nav {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  width: 100%;
+  max-width: 700px;
+  p {
+    min-width: 100px;
+  }
+  @media (max-width: 700px) {
+    flex-direction: column;
+    gap: 15px;
+  }
+  button {
+    margin-left: auto;
+    @media (max-width: 700px) {
+      margin: auto;
+      margin-bottom: 16px;
+    }
+  }
+  .difficulty {
+    background-color: white;
+    padding: 4px 14px;
+    border-radius: 4px;
+  }
+}
 .wrapper {
   width: 100%;
   aspect-ratio: 1/1;

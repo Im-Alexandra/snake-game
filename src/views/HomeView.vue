@@ -1,29 +1,17 @@
 <template>
   <div class="home">
-    <h1>
-      <span class="emoji">🐍</span> Snake game <span class="emoji">🐍</span>
-    </h1>
-    <div class="nav">
-      <p>Time: {{ state.time }}</p>
-      <p>Score: {{ state.score }}</p>
-      <p>Player: {{ state.player.toUpperCase() }}</p>
-      <button @click="toggleModal('score')" type="button">
-        See high score
-      </button>
-    </div>
-
-    <!-- <SnakeCanvas :isListening="state.isListening"></SnakeCanvas> -->
-
+    <h1><span>🐍</span> Snake game <span>🐍</span></h1>
     <SnakeGrid
       :isListening="state.isListening"
       :isPaused="state.isPaused"
       :gameOver="state.gameOver"
-      :score="state.score"
       :isMoving="state.isMoving"
+      :difficulty="state.difficulty"
+      :player="state.player"
       @togglePaused="togglePaused"
       @gameOver="gameOver"
-      @scored="incrementScore"
-      @moving="updateTime"
+      @moving="toggleMoving"
+      @openHighScore="toggleModal('score')"
     ></SnakeGrid>
 
     <button
@@ -54,9 +42,44 @@
     >
       <div class="modal-content">
         <h1>Your name:</h1>
-        <input type="text" v-model="state.player" required placeholder="name" />
+        <input
+          type="text"
+          :value="state.player.toUpperCase()"
+          @input="state.player = $event.target.value.toUpperCase()"
+          required
+          placeholder="name"
+        />
         <span v-if="state.nameError" class="error">{{ state.nameError }}</span>
-        <button @click="saveName" type="button">Save</button>
+        <h2>Difficulty:</h2>
+        <div class="difficulty-wrapper">
+          <label for="easy">
+            <input
+              type="radio"
+              v-model="state.difficulty"
+              value="easy"
+              id="easy"
+              checked
+            />Easy</label
+          >
+          <label for="medium">
+            <input
+              type="radio"
+              v-model="state.difficulty"
+              value="medium"
+              id="medium"
+            />
+            Medium</label
+          >
+          <label for="hard">
+            <input
+              type="radio"
+              v-model="state.difficulty"
+              value="hard"
+              id="hard"
+            />Hard</label
+          >
+        </div>
+        <button @click="saveName" type="button">Play</button>
       </div>
     </GameModal>
 
@@ -66,8 +89,7 @@
       @close="toggleModal('score')"
     >
       <div class="modal-content">
-        <h1>High score:</h1>
-        <HighScore />
+        <HighScore :headline="'big'" />
         <button @click="toggleModal('score')" type="button">Close</button>
       </div>
     </GameModal>
@@ -77,17 +99,19 @@
       :modalActive="state.gameOverModalActive"
       @close="toggleModal('game')"
     >
-      <div class="modal-content">
+      <div v-if="state.gameOverData" class="modal-content">
         <h1>Game over!</h1>
         <p class="your-score">
-          Your score: {{ state.score }}, your time: {{ state.time }}s
+          Your score: {{ state.gameOverData.score }}, your time:
+          {{ state.gameOverData.time }}s
         </p>
-        <h2>High score:</h2>
         <HighScore
+          :headline="'small'"
           :player="{
             player: state.player,
-            score: state.score,
-            time: state.time,
+            score: state.gameOverData.score,
+            time: state.gameOverData.time,
+            difficulty: state.difficulty,
           }"
           :modalActive="state.gameOverModalActive"
         />
@@ -111,17 +135,17 @@ export default {
   components: { GameModal, SnakeGrid, HighScore },
   setup() {
     const state = reactive({
+      difficulty: "easy",
+      player: "",
+      nameError: null,
       scoreModalActive: false,
       nameModalActive: false,
       gameOverModalActive: false,
-      score: 0,
-      time: 0,
-      player: "",
-      nameError: null,
       isListening: false,
       isPaused: false,
       gameOver: false,
       isMoving: false,
+      gameOverData: null,
     });
 
     watch(
@@ -152,19 +176,8 @@ export default {
       }
     };
 
-    const updateTime = () => {
-      state.isMoving = true;
-      timer();
-    };
-
-    const timer = () => {
-      if (!state.isMoving || state.gameOver) return;
-      state.time++;
-      setTimeout(timer, 1000);
-    };
-
-    const incrementScore = (increment) => {
-      state.score += increment;
+    const toggleMoving = () => {
+      state.isMoving = !state.isMoving;
     };
 
     const toggleListening = () => {
@@ -174,18 +187,14 @@ export default {
     const togglePaused = () => {
       state.isPaused = !state.isPaused;
       state.isMoving = !state.isMoving;
-      if (state.isMoving) timer();
+      /* if (state.isMoving) timer(); */
     };
 
-    const gameOver = async () => {
+    const gameOver = async (data) => {
       state.gameOver = true;
-      const playerToAdd = {
-        player: state.player.toUpperCase(),
-        score: state.score,
-        time: state.time,
-      };
+      state.gameOverData = data;
       const colRef = collection(db, "highscores");
-      await addDoc(colRef, playerToAdd);
+      await addDoc(colRef, state.gameOverData);
     };
 
     const restartGame = () => {
@@ -196,11 +205,10 @@ export default {
       state,
       toggleModal,
       saveName,
-      incrementScore,
       toggleListening,
       togglePaused,
       gameOver,
-      updateTime,
+      toggleMoving,
       restartGame,
     };
   },
@@ -208,12 +216,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.emoji {
-  transition: all 0.2s ease-in-out;
-}
-.emoji:hover {
-  transform: rotate(90deg);
-}
 .your-score {
   margin-bottom: 32px;
   border-bottom: 2px solid #d8cc34;
@@ -235,27 +237,17 @@ export default {
   button {
     margin-bottom: 16px;
   }
-  .nav {
+}
+.difficulty-wrapper {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+  margin-top: 16px;
+
+  label {
     display: flex;
-    justify-content: center;
-    align-items: baseline;
-    gap: 20px;
-    width: 100%;
-    max-width: 700px;
-    p {
-      min-width: 100px;
-    }
-    @media (max-width: 700px) {
-      flex-direction: column;
-      gap: 0;
-    }
-    button {
-      margin-left: auto;
-      @media (max-width: 700px) {
-        margin: auto;
-        margin-bottom: 16px;
-      }
-    }
+    cursor: pointer;
+    gap: 5px;
   }
 }
 </style>
