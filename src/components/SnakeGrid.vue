@@ -132,12 +132,9 @@ export default {
     const timer = () => {
       if (props.isPaused || props.gameOver) return;
       time.value++;
-
       if (time.value % speedDivisor === 0) {
         speed += 0.5;
-        console.log(speed, speedDivisor, props.difficulty);
       }
-
       setTimeout(timer, 1000);
     };
 

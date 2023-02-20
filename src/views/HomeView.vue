@@ -95,7 +95,7 @@
       @close="toggleModal('score')"
     >
       <div class="modal-content">
-        <HighScore :headline="'big'" />
+        <HighScore :headline="'big'" :difficulty="state.difficulty" />
         <button @click="toggleModal('score')" type="button">Close</button>
       </div>
     </GameModal>
@@ -117,8 +117,8 @@
             player: state.player,
             score: state.gameOverData.score,
             time: state.gameOverData.time,
-            difficulty: state.difficulty,
           }"
+          :difficulty="state.difficulty"
           :modalActive="state.gameOverModalActive"
         />
         <button @click="restartGame" type="button">Restart game</button>

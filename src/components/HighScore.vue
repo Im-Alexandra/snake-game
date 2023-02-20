@@ -46,7 +46,7 @@ import getCollection from "../composables/getCollection";
 
 export default {
   name: "HighScore",
-  props: ["player", "modalActive", "headline"],
+  props: ["player", "modalActive", "headline", "difficulty"],
   setup(props) {
     let difficultyQuery = ref("easy");
     const { documents: highscores } = getCollection("highscores");
@@ -76,23 +76,31 @@ export default {
       () => {
         if (props.modalActive && props.player) {
           setTimeout(() => {
-            difficultyQuery.value = props.player.difficulty;
+            difficultyQuery.value = props.difficulty;
             highlightIfInHighscore(
               props.player.player,
               props.player.score,
               props.player.time
             );
-          }, 500);
+          }, 100);
         }
       },
       { immediate: true }
     );
 
+    watch(
+      () => props.difficulty,
+      () => {
+        console.log("change");
+        difficultyQuery.value = props.difficulty;
+      }
+    );
+
     watch(difficultyQuery, () => {
       if (!props.player) return;
-      if (props.player.difficulty !== difficultyQuery.value) {
+      if (props.difficulty !== difficultyQuery.value) {
         removeHighligh();
-      } else if (props.player.difficulty === difficultyQuery.value) {
+      } else if (props.difficulty === difficultyQuery.value) {
         setTimeout(() => {
           highlightIfInHighscore(
             props.player.player,
