@@ -4,9 +4,6 @@
       <p>Time: {{ time }}</p>
       <p>Score: {{ score }}</p>
       <p>Player: {{ player }}</p>
-      <div v-if="difficulty" class="difficulty">
-        {{ difficulty.toUpperCase() }}
-      </div>
       <button @click="$emit('openHighScore')">See high score</button>
     </div>
     <div class="wrapper">
@@ -370,11 +367,6 @@ export default {
       margin: auto;
       margin-bottom: 16px;
     }
-  }
-  .difficulty {
-    background-color: white;
-    padding: 4px 14px;
-    border-radius: 4px;
   }
 }
 .wrapper {

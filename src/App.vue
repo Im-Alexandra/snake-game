@@ -76,7 +76,7 @@ button:disabled {
     border-radius: 4px;
     border: none;
     background-color: #d7d7d7;
-    margin-bottom: 32px;
+    margin-bottom: 5px;
     &:focus {
       border: none;
       outline: none;

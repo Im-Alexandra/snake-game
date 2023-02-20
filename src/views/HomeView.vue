@@ -31,10 +31,16 @@
       Restart game
     </button>
     <button v-else type="button" @click="togglePaused">Pause - press p</button>
-
-    <div v-if="state.isListening && !state.isPaused && !state.gameOver">
-      <p>Use arrows or WASD to move</p>
-    </div>
+    <Transition name="fade-in">
+      <div v-if="state.isListening && !state.isPaused && !state.gameOver">
+        <p>Use arrows or WASD to move</p>
+      </div>
+    </Transition>
+    <Transition name="fade-in">
+      <div v-if="state.isListening" class="difficulty">
+        {{ state.difficulty.toUpperCase() }}
+      </div>
+    </Transition>
     <!-- NAME MODAL -->
     <GameModal
       :modalActive="state.nameModalActive"
@@ -50,7 +56,7 @@
           placeholder="name"
         />
         <span v-if="state.nameError" class="error">{{ state.nameError }}</span>
-        <h2>Difficulty:</h2>
+        <h2 class="subheadline">Difficulty:</h2>
         <div class="difficulty-wrapper">
           <label for="easy">
             <input
@@ -216,6 +222,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.fade-in-enter-active,
+.fade-in-leave-active {
+  transition: opacity 0.3s cubic-bezier(0.52, 0.02, 0.19, 1.02);
+}
+.fade-in-enter-from,
+.fade-in-leave-to {
+  opacity: 0;
+}
 .your-score {
   margin-bottom: 32px;
   border-bottom: 2px solid #d8cc34;
@@ -236,6 +250,16 @@ export default {
   p,
   button {
     margin-bottom: 16px;
+  }
+  .difficulty {
+    background-color: white;
+    padding: 4px 14px;
+    border-radius: 4px;
+  }
+}
+.modal-content {
+  .subheadline {
+    margin-top: 32px;
   }
 }
 .difficulty-wrapper {
