@@ -387,6 +387,9 @@ export default {
 .remove {
   opacity: 0;
 }
+#placeholder {
+  position: relative;
+}
 #grid-board {
   background-color: white;
   width: 100%;

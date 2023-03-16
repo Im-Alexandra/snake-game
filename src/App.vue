@@ -19,11 +19,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@200;300;400&display=swap");
 body {
   font-family: "Josefin Sans", sans-serif;
+  background-color: #ffddd2;
 }
 #app {
   width: 100vw;
-  height: 100vh;
-  background-color: #ffddd2;
 }
 h1,
 h2,

@@ -255,6 +255,7 @@ export default {
     background-color: white;
     padding: 4px 14px;
     border-radius: 4px;
+    margin-bottom: 100px;
   }
 }
 .modal-content {
