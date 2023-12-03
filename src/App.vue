@@ -81,6 +81,10 @@ button:disabled {
       outline: none;
     }
   }
+  .text-balance {
+    text-align: center;
+    text-wrap: balance;
+  }
 }
 
 /* router transition */

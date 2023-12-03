@@ -1,6 +1,17 @@
 <template>
   <div class="home">
     <h1><span>🐍</span> Snake game <span>🐍</span></h1>
+    <svg
+      @click="toggleModal('info')"
+      class="info-icon"
+      xmlns="http://www.w3.org/2000/svg"
+      height="1.5em"
+      viewBox="0 0 512 512"
+    >
+      <path
+        d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"
+      />
+    </svg>
     <SnakeGrid
       :isListening="state.isListening"
       :isPaused="state.isPaused"
@@ -41,6 +52,30 @@
         {{ state.difficulty.toUpperCase() }}
       </div>
     </Transition>
+    <!-- INFO MODAL -->
+    <GameModal
+      :modalActive="state.infoModalActive"
+      @close="($event) => toggleModal('info')"
+    >
+      <div class="modal-content">
+        <h1>Project info</h1>
+        <p class="text-balance">
+          Snake game was made as an "interview test" project. The interview was
+          for the Front-end game developer position at
+          <a href="https://trophy-games.com/" target="_blank">Trophy Games</a>
+          in April 2023. It took around 2 days of work, cca 16h.
+        </p>
+        <p>
+          Coding test
+          <a
+            href="https://drive.google.com/file/d/1Psg6jTAtn4inx8JdY7vtJWpGmiuGNGHZ/view?usp=drive_link"
+            target="_blank"
+            >requirements</a
+          >
+        </p>
+        <p>Project is build with Vue3 and Firebase.</p>
+      </div>
+    </GameModal>
     <!-- NAME MODAL -->
     <GameModal
       :modalActive="state.nameModalActive"
@@ -147,6 +182,7 @@ export default {
       scoreModalActive: false,
       nameModalActive: false,
       gameOverModalActive: false,
+      infoModalActive: false,
       isListening: false,
       isPaused: false,
       gameOver: false,
@@ -170,6 +206,8 @@ export default {
         state.nameModalActive = !state.nameModalActive;
       else if (modalType === "game")
         state.gameOverModalActive = !state.gameOverModalActive;
+      else if (modalType === "info")
+        state.infoModalActive = !state.infoModalActive;
     };
 
     const saveName = () => {
@@ -243,6 +281,13 @@ export default {
   width: 80%;
   padding-top: 120px;
   margin: auto;
+  position: relative;
+  .info-icon {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    cursor: pointer;
+  }
   @media (max-width: 700px) {
     padding-top: 50px;
   }

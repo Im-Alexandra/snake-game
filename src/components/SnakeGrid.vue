@@ -2,12 +2,14 @@
   <div class="container">
     <div class="nav">
       <p>Time: {{ time }}</p>
-      <p>Score: {{ score }}</p>
+      <div class="score">
+        Score: {{ score }}
+        <div id="placeholder"></div>
+      </div>
       <p>Player: {{ player }}</p>
       <button @click="$emit('openHighScore')">See high score</button>
     </div>
     <div class="wrapper">
-      <div id="placeholder"></div>
       <img
         class="intro-img"
         src="@/assets/intro.png"
@@ -66,6 +68,7 @@ export default {
           setDifficultyVariables();
           window.addEventListener("keydown", (e) => {
             if (props.gameOver) return;
+            e.preventDefault();
             switch (e.key) {
               case "w":
               case "ArrowUp":
@@ -295,15 +298,9 @@ export default {
     const animateScored = () => {
       const audio = new Audio(scored);
       audio.play();
-      const rect = document
-        .getElementsByClassName("food")[0]
-        .getBoundingClientRect();
       const plusOne = document.createElement("div");
       plusOne.classList.add("plus-one");
       plusOne.innerHTML += "+1";
-      plusOne.style.position = "absolute";
-      plusOne.style.left = rect.left + "px";
-      plusOne.style.top = rect.top + "px";
       document.getElementById("placeholder").appendChild(plusOne);
       const addedEls = document.getElementsByClassName("plus-one");
       if (addedEls.length < 1) {
@@ -351,6 +348,16 @@ export default {
   gap: 20px;
   width: 100%;
   max-width: 700px;
+  position: relative;
+  .score {
+    min-width: 100px;
+    position: relative;
+    #placeholder {
+      position: absolute;
+      top: 0;
+      left: 60%;
+    }
+  }
   p {
     min-width: 100px;
   }
@@ -386,9 +393,6 @@ export default {
 }
 .remove {
   opacity: 0;
-}
-#placeholder {
-  position: relative;
 }
 #grid-board {
   background-color: white;
